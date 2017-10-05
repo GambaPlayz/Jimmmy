@@ -1,0 +1,274 @@
+import discord
+import datetime
+import time
+import asyncio
+import logging
+import os
+from cogs.utils import checks
+from discord.ext import commands
+from random import choice, randint
+from cogs.utils import checks
+from cogs.utils.dataIO import dataIO
+from cogs.utils.chat_formatting import box, pagify
+from copy import deepcopy
+
+a=discord.Embed(title="Info About CodeBLUE'", description="""**CodeBLUE is mainly a Discord music bot with some other modular commands.**\n\nSupport Server: [Help](https://discord.gg/fwrFXME)\n\nInvite Me  : [Invitation](https://discordapp.com/oauth2/authorize?client_id=258342586798964736&scope=bot&permissions=2146958463)\n\nDonate : [PayPal](https://paypal.com/gambaplayz)\n\nAudio Cog By  : [ItzVexy™✔|~ƵƤ ✿#5385](https://discordapp.com/oauth2/authorize?client_id=258342586798964736&scope=bot&permissions=2146958463)""", colour=discord.Colour.blue())
+a.set_thumbnail(url="https://cdn.discordapp.com/attachments/297003745336623105/298217091713073153/info-xxl.png")
+
+audio = discord.Embed(colour=discord.Colour.blue(), description="""
+[**__Audio Commands:__**](https://127.0.0.1)
+
+**`np`** ~~-~~         **Shows the current playing song**.
+
+**`pause`** ~~-~~        **The current song will be paused.**.
+
+**`play`** ~~-~~        **Play the specified song or playlist**.
+
+**`queue`** ~~-~~       **Shows the current queue**.
+
+**`resume`** ~~-~~     **Resumes the song you paused**.
+
+**`skip`** ~~-~~       **Skips the current song**.
+
+**`shuffle`** ~~-~~     **Shuffles the current queue**.
+
+**`stop`** ~~-~~       **Stops the currently playing song or playlist**.
+
+**`volume`** ~~-~~      **Sets the volume (0 - 100)**.
+
+**`disconnect`** ~~-~~  **Disconnects the bot from the voice channel**.""")
+audio.set_thumbnail(url="https://lh3.googleusercontent.com/dUsfnDQJZt2v9d1n2tWsPZiYLLmOQkjv3R4rbsTw83lYGo2cQe8u2z-0YQPxmmcgkL8d=w170")
+
+other = discord.Embed(colour=discord.Colour.blue(), description="""
+[**__Bot Commands:__**](https://127.0.0.1)
+
+**`antilink`** ~~-~~    **Settings for antilink on your server**.
+
+**`autorole`** ~~-~~    **Change settings for autorole**.
+
+**`away`** ~~-~~       **Sets your away status**.
+
+**`embedsay`** ~~-~~       **Says Something as the bot in an embed**.
+
+**`invite`** ~~-~~    **You can add me to your server with this**.
+
+**`ping`** ~~-~~      **Pong!**
+
+**`say`** ~~-~~       **Says Something as the bot not in an embed**.
+
+**`serverprefix`** ~~-~~       **Set the server prefix**.
+
+**`modlogset`** ~~-~~       **Enables you to change modlog's settings**.
+
+**`modlogtoggles`** ~~-~~       **Toggles the modlog's different features**.
+
+**`cookie`** ~~-~~     **Forcefully feeds a user a cookie**.
+
+**`bomb`** ~~-~~    **Forcefully feeds a user a cookie**.
+
+**`profile`** ~~-~~    **Shows a user profile**.
+
+**`profileinfo`** ~~-~~    **Shows profile information**.
+
+**`rank`** ~~-~~    **Shows rank info**.
+
+**`rep`** ~~-~~    **Shows rep level**.
+
+**`top10`** ~~-~~    **Top 10**.
+
+**`slap`** ~~-~~    **Slaps a user**.
+
+**`trivia`** ~~-~~    **Starts a trivia session**.
+""")
+other2 = discord.Embed(colour=discord.Colour.blue(), description="""
+[**__Info Commands:__**](https://127.0.0.1)
+
+**`uptime`** ~~-~~     **Shows you how long the bot has been up for**.
+
+**`userinfo`** ~~-~~    **Shows users's information**.
+
+**`serverinfo`** ~~-~~  **Shows server's information**.
+
+**`info`** ~~-~~       **Shows information on CodeBLUE'**.
+
+**`stats`** ~~-~~       **Shows CodeBLUE's stats straight from the support server**.
+""")
+
+other3 = discord.Embed(colour=discord.Colour.blue(), description="""
+[**__Economy Commands:__**](https://127.0.0.1)
+
+**`bank`** ~~-~~ **Bank operations**
+
+**`economyset`** ~~-~~ **Changes economy module settings**
+
+**`leaderboard`** ~~-~~ **Server / global leaderboard**
+
+**`payday`** ~~-~~ **Get some free credits**
+
+**`payouts`** ~~-~~ **Shows slot machine payouts**
+
+**`slot`** ~~-~~ **Play the slot machine**
+""")
+
+other4 = discord.Embed(colour=discord.Colour.blue(), description="""
+[**__Admin Commands:__**](https://127.0.0.1)
+
+**`punish`** ~~-~~       **Places a user in timeout for a period of time**.
+
+**`unpunish`** ~~-~~       **Unpunishes a punished user**.
+
+**`muted`** ~~-~~       **Shows the list of punished users**.
+
+**`botclean`** ~~-~~    **Removes all bot messages**.
+
+**`prune`**  ~~-~~    **Deletes messages**.
+
+**`ban`** ~~-~~    **Bans people**.
+
+**`kick`** ~~-~~    **Kicks people**.
+
+**`warn`** ~~-~~    **Warns a user**.
+
+**`warns`** ~~-~~    **Shows a users warnings**.
+
+**`resetwarns`** ~~-~~    **Resets a user's warnings**
+
+**`lvladmin`** ~~-~~    **Admin toggle features**.
+
+**`lvladminbg`** ~~-~~    **Admin background configuration**.
+
+**`lvlset`** ~~-~~    **Profile configuration options**.
+
+**`lockdown`** ~~-~~    **Locks down a server to a certain channel for raid prevention**.
+
+**`lockdownset`** ~~-~~    **Lockdown settings**.
+
+**`unlockdown`** ~~-~~    **Lifts the server lockdown**.
+
+**`massdm`** ~~-~~    **Mass DMs a certain role's users**.
+
+**`welcomer`** ~~-~~    **Allows for setting of a welcome / leave message**.
+
+**`star`** ~~-~~    **Stars a message**.
+
+**`unstar`** ~~-~~    **Unstars a message**.
+
+**`starboard`** ~~-~~    **Sets up the starboard**.
+
+**`ignore`** ~~-~~    **Ignores a set channel, user, or role**.
+
+**`unignore`** ~~-~~    **Unignores the channel, user, or role**.
+
+**`triviaset`** ~~-~~    **Allows you to change settings for trivia**.
+
+""")
+other.title = ""
+other2.title = ""
+other3.title = ""
+other.set_thumbnail(url="https://images.discordapp.net/.eJwFwUsSwiAMANC7sOcfaultMETKSEkHcOV4d9_7is9o4hDnWvc8tM51Io-s5uKRCqnCXBqlu06FfOm0VsLzor6mdsFGcB688QGCB7DaxS3udjcu-s2AhYfThTqNivLZEr7li1umIStyV3cv4vcHsv0pSQ.DS6SWAYup10rn1pPB9niA2OF1xU?width=300&height=300")
+other3.set_thumbnail(url="https://cdn.discordapp.com/attachments/258719924980023297/327194504727625728/unknown.png")
+other4.set_thumbnail(url="https://cdn.discordapp.com/attachments/258719924980023297/327194696080424970/unknown.png")
+
+class Help:
+    def __init__(self, bot):
+        self.bot = bot
+
+    @commands.command(pass_context=True)
+    async def help(self, ctx):
+        """Channel help command."""
+        server= ctx.message.server
+        try:
+            e = discord.Embed(colour=discord.Colour.blue())
+            e.title = "CodeBLUE's Help:"
+            e.description = "**1)** To get all of CodeBLUE's commands you may type `>cmds`.\n"
+            e.description += "**2)** For help with CodeBLUE join the support server. [Here](https://discord.gg/fwrFXME)\n"
+            e.description += "**3)** And for any comments or concerns please use the `>contact` command."
+            e.set_footer(text="Thank you for reading this and have a great day!")
+            await self.bot.say(embed=e)
+        except Exception as e:
+            await self.bot.say(e)
+
+
+    @commands.command(pass_context=True)
+    async def cmds(self, ctx):
+        """Pm help commands."""
+        try:
+            await self.bot.whisper(embed=a)
+            await asyncio.sleep(1)
+            await self.bot.whisper(embed=audio)
+            await asyncio.sleep(1)
+            await self.bot.whisper(embed=other)
+            await asyncio.sleep(1)
+            await self.bot.whisper(embed=other2)
+            await asyncio.sleep(1)
+            await self.bot.whisper(embed=other3)
+            await asyncio.sleep(1)
+            await self.bot.whisper(embed=other4)
+        except Exception as e:
+            await self.bot.say(e)
+
+    @commands.command(pass_context = True)
+    @checks.mod_or_permissions(manage_messages=True)
+    async def botclean(self, ctx, limit : int = None):
+        """Removes all bot messages."""
+        if limit is None:
+            limit = 100
+        elif limit > 100:
+            limit = 100
+        await self.bot.purge_from(ctx.message.channel, limit=limit, before=ctx.message, check= lambda e: e.author.bot)
+
+    async def on_message(self, message):
+        server = message.server
+        if message.content == ">cmds":
+            if not message.channel.is_private:
+                await self.bot.send_message(message.channel, message.author.mention+", `I just slid into your DMs with my commands.` :mailbox_with_mail:")
+        elif message.content == "<@!258342586798964736> cmds":
+            if not message.channel.is_private:
+                await self.bot.send_message(message.channel, message.author.mention+", `I just slid into your DMs with my commands.` :mailbox_with_mail:")
+        elif message.content == "<@258342586798964736> cmds":
+            if not message.channel.is_private:
+                await self.bot.send_message(message.channel, message.author.mention+", `I just slid into your DMs with my commands.` :mailbox_with_mail:")
+        elif message.content == "<@258342586798964736>":
+            e = discord.Embed(colour=discord.Colour.blue())
+            e.title = "CodeBLUE's Help:"
+            e.description = "**1}** To get all of CodeBLUE's commands you may type `>cmds`.\n"
+            e.description += "**2}** For help with CodeBLUE join the support server. [Here](https://discord.gg/fwrFXME)\n"
+            e.description += "**3}** And for any comments or concerns please use the `>contact` command."
+            e.set_footer(text="Thank you for reading this and have a great day!")
+            e.set_thumbnail(url=server.me.avatar_url)
+            await self.bot.send_message(message.channel, embed=e)
+
+    @commands.command(pass_context=True)
+    async def ping(self, ctx):
+        """Pong."""
+        t1 = time.perf_counter()
+        await self.bot.send_typing(ctx.message.channel)
+        t2 = time.perf_counter()
+        thedata = ("**Pong.**\nResponse Time: " + str(round((t2-t1)*1000)) + " **ms** :ping_pong: ")
+        color = ''.join([choice('0123456789ABCDEF') for x in range(6)])
+        color = int(color, 16)
+        data = discord.Embed(description=thedata, colour=discord.Colour(value=color))
+
+        await self.bot.say(embed=data)
+
+
+        def setup(bot):
+            n = ping(bot)
+            bot.add_cog(n)
+
+    @commands.command(pass_context=True, no_pm=True)
+    async def invite(self, ctx):
+        author = ctx.message.author
+        await self.bot.say(author.mention+" **You can add me to your server with this:**\nhttps://discordapp.com/oauth2/authorize?client_id=258342586798964736&scope=bot&permissions=2146958463")
+
+def setup(bot):
+    n = Help(bot)
+    bot.remove_command('help')
+    bot.remove_command('info')
+    bot.remove_command('ping')
+    bot.remove_command('join')
+    bot.remove_command('version')
+    bot.remove_command('botclean')
+    bot.remove_command('cmds')
+    bot.remove_command('invite')
+    bot.add_cog(n)
